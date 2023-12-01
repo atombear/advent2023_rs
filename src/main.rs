@@ -1,5 +1,6 @@
 extern crate core;
 
+mod utils;
 mod problem20231201;
 
 fn process_answer(answers: &mut Vec<String>, idx: usize, ans0: String, ans1: String) {
