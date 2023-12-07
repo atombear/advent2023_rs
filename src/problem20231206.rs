@@ -31,17 +31,17 @@ pub fn problem() -> (usize, String, String) {
         .map(|x| x.parse::<u64>().unwrap())
         .collect::<Vec<u64>>();
 
-    let mut prod0: u64 = 1;
-    let mut cnt: u64;
-    for (t, d) in times.iter().zip(distances) {
-        cnt = (0..*t)
-            .filter(|speed| speed * (t - speed) > d)
-            .map(|_| 1)
-            .sum();
-        if cnt > 0 {
-            prod0 *= cnt;
-        }
-    }
+    let prod0: u64 = times
+        .iter()
+        .zip(distances)
+        .map(|(t, d)|
+            (0..*t)
+                .filter(|speed| speed * (t - speed) > d)
+                .map(|_| 1)
+                .sum::<u64>()
+        )
+        .filter(|c| *c > 0)
+        .product();
 
     let big_time: u64 = all_lines[0]
         .split(':')
@@ -62,8 +62,8 @@ pub fn problem() -> (usize, String, String) {
     let b: f64 = -1.0 * (big_time as f64);
     let c: f64 = big_distance as f64;
 
-    let r0: f64 = (-b + (b * b - 4.0 * a * c).sqrt()) / 2.0;
-    let r1: f64 = (-b - (b * b - 4.0 * a * c).sqrt()) / 2.0;
+    let r0: f64 = (-b + (b * b - 4.0 * a * c).sqrt()) / 2.0 / a;
+    let r1: f64 = (-b - (b * b - 4.0 * a * c).sqrt()) / 2.0 / a;
 
     return (5, format!("{}", prod0), format!("{}", (1.0 + r0 - r1) as u64));
 }
