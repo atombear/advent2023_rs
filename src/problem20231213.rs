@@ -15,29 +15,7 @@ fn transpose(pat: &Vec<String>) -> Vec<String> {
         .collect::<Vec<String>>();
 }
 
-fn find_reflect_plane(pat: &Vec<String>) -> Option<usize> {
-    let mut jdx: usize;
-    let mut kdx: usize;
-    for idx in 0..pat.len() - 1 {
-        if pat[idx] == pat[idx + 1] {
-            jdx = idx;
-            kdx = idx + 1;
-            loop {
-                if pat[jdx] == pat[kdx] && (jdx == 0 || kdx == pat.len() - 1) {
-                    return Some(idx);
-                } else if pat[jdx] != pat[kdx] {
-                    break;
-                } else {
-                    jdx -= 1;
-                    kdx += 1;
-                }
-            }
-        }
-    }
-    return None;
-}
-
-fn find_reflect_plane_smudge(pat: &Vec<String>) -> Option<usize> {
+fn find_reflect_plane_smudge(pat: &Vec<String>, num_smudges: usize) -> Option<usize> {
     let mut jdx: usize;
     let mut kdx: usize;
     let mut smudges: usize;
@@ -55,7 +33,7 @@ fn find_reflect_plane_smudge(pat: &Vec<String>) -> Option<usize> {
             if smudges > 1 {
                 break;
             } else if jdx == 0 || kdx == pat.len() - 1 {
-                if smudges == 1 {
+                if smudges == num_smudges {
                     return Some(idx);
                 } else {
                     break;
@@ -97,11 +75,11 @@ pub fn problem() -> (usize, String, String) {
     let mut left_count0: u64 = 0;
     let mut top_count0: u64 = 0;
     for pat in &patterns {
-        left_count0 += match find_reflect_plane(&transpose(&pat)) {
+        left_count0 += match find_reflect_plane_smudge(&transpose(&pat), 0) {
             Some(val) => { 1 + (val as u64) }
             None => { 0 }
         };
-        top_count0 += match find_reflect_plane(&pat) {
+        top_count0 += match find_reflect_plane_smudge(&pat, 0) {
             Some(val) => { 1 + (val as u64) }
             None => { 0 }
         };
@@ -110,11 +88,11 @@ pub fn problem() -> (usize, String, String) {
     let mut left_count1: u64 = 0;
     let mut top_count1: u64 = 0;
     for pat in &patterns {
-        left_count1 += match find_reflect_plane_smudge(&transpose(&pat)) {
+        left_count1 += match find_reflect_plane_smudge(&transpose(&pat), 1) {
             Some(val) => { 1 + (val as u64) }
             None => { 0 }
         };
-        top_count1 += match find_reflect_plane_smudge(&pat) {
+        top_count1 += match find_reflect_plane_smudge(&pat, 1) {
             Some(val) => { 1 + (val as u64) }
             None => { 0 }
         };
