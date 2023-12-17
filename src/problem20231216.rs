@@ -18,7 +18,6 @@ fn get_energized_points(
 ) -> usize {
     let mut new_beams: HashSet<(Point, char)> = beams.clone();
     let mut temp_beams: HashSet<(Point, char)>;
-    // let mut rm_beams: HashSet<(Point, char)>;
     let mut energized_mirrors: HashSet<Point> = HashSet::new();
 
     let mut p: Point;
@@ -109,6 +108,22 @@ fn get_energized_points(
     return energized_points;
 }
 
+fn get_b0bf0(idx: usize, _rows: usize, _cols: usize) -> ((Point, char), (Point, char)) {
+    return (((idx, 0), 'r'), ((idx, 0), 'l'));
+}
+
+fn get_b0bf1(idx: usize, _rows: usize, _cols: usize) -> ((Point, char), (Point, char)) {
+    return (((0, idx), 'd'), ((0, idx), 'u'));
+}
+
+fn get_b0bf2(idx: usize, _rows: usize, cols: usize) -> ((Point, char), (Point, char)) {
+    return (((idx, cols - 1), 'l'), ((idx, cols - 1), 'r'));
+}
+
+fn get_b0bf3(idx: usize, rows: usize, _cols: usize) -> ((Point, char), (Point, char)) {
+    return (((rows - 1, idx), 'u'), ((rows - 1, idx), 'd'));
+}
+
 pub fn problem() -> (usize, String, String) {
     let data_dir: String = env!("CARGO_MANIFEST_DIR").to_owned();
     let data_path: PathBuf = [data_dir, "src".to_string(), format!("input{}", DAY)]
@@ -162,52 +177,20 @@ pub fn problem() -> (usize, String, String) {
     let mut beams: HashSet<(Point, char)> = HashSet::new();
     let mut b0: (Point, char);
     let mut bf: (Point, char);
-    for idx in 0..rows {
-        b0 = ((idx, 0), 'r');
-        bf = ((idx, 0), 'l');
-        if !all_beams.contains(&b0) || !all_beams.contains(&bf) {
-            beams.insert(b0);
-            max_points = max(
-                max_points,
-                get_energized_points(&mut beams, &vsplit, &hsplit, &umirr, &dmirr, rows, cols)
-            );
-            all_beams.extend(beams.drain());
-        }
-    }
-    for idx in 0..cols {
-        b0 = ((0, idx), 'd');
-        bf = ((0, idx), 'u');
-        if !all_beams.contains(&b0) || !all_beams.contains(&bf) {
-            beams.insert(b0);
-            max_points = max(
-                max_points,
-                get_energized_points(&mut beams, &vsplit, &hsplit, &umirr, &dmirr, rows, cols)
-            );
-            all_beams.extend(beams.drain());
-        }
-    }
-    for idx in 0..rows {
-        b0 = ((idx, cols - 1), 'l');
-        bf = ((idx, cols - 1), 'r');
-        if !all_beams.contains(&b0) || !all_beams.contains(&bf) {
-            beams.insert(b0);
-            max_points = max(
-                max_points,
-                get_energized_points(&mut beams, &vsplit, &hsplit, &umirr, &dmirr, rows, cols)
-            );
-            all_beams.extend(beams.drain());
-        }
-    }
-    for idx in 0..rows {
-        b0 = ((rows - 1, idx), 'u');
-        bf = ((rows - 1, idx), 'd');
-        if !all_beams.contains(&b0) || !all_beams.contains(&bf) {
-            beams.insert(b0);
-            max_points = max(
-                max_points,
-                get_energized_points(&mut beams, &vsplit, &hsplit, &umirr, &dmirr, rows, cols)
-            );
-            all_beams.extend(beams.drain());
+
+    for (max_num, getb0bf) in [rows, cols, rows, cols]
+        .iter()
+        .zip([get_b0bf0, get_b0bf1, get_b0bf2, get_b0bf3]) {
+        for idx in 0..*max_num {
+            (b0, bf) = getb0bf(idx, rows, cols);
+            if !all_beams.contains(&b0) || !all_beams.contains(&bf) {
+                beams.insert(b0);
+                max_points = max(
+                    max_points,
+                    get_energized_points(&mut beams, &vsplit, &hsplit, &umirr, &dmirr, rows, cols)
+                );
+                all_beams.extend(beams.drain());
+            }
         }
     }
 
