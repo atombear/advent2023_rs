@@ -83,7 +83,10 @@ fn get_next_nodes_wobbly(n: Node, rows: usize, cols: usize) -> Vec<Node> {
     }
 }
 
-fn timed_bfs(heat_loss: &Vec<Vec<u64>>) -> u64 {
+fn timed_bfs(
+    heat_loss: &Vec<Vec<u64>>,
+    gnn: fn(n: Node, rows: usize, cols: usize) -> Vec<Node>
+) -> u64 {
     let rows: usize = heat_loss.len();
     let cols: usize = heat_loss[0].len();
 
@@ -107,42 +110,7 @@ fn timed_bfs(heat_loss: &Vec<Vec<u64>>) -> u64 {
             }
 
             if !visited.contains(&node) {
-                for new_node in get_next_nodes(node, rows, cols) {
-                    next_nodes.push((t + heat_loss[new_node.0.0][new_node.0.1], new_node));
-                    next_nodes.sort();
-                }
-            }
-            visited.insert(node);
-        }
-        t += 1;
-    }
-}
-
-fn timed_bfs_w(heat_loss: &Vec<Vec<u64>>) -> u64 {
-    let rows: usize = heat_loss.len();
-    let cols: usize = heat_loss[0].len();
-
-    let mut next_nodes: Vec<(u64, Node)> = vec![
-        (heat_loss[1][0], ((1, 0), 1, 'd')),
-        (heat_loss[0][1], ((0, 1), 1, 'r'))
-    ];
-    next_nodes.sort();
-
-    let mut t: u64 = 0;
-
-    let mut visited: HashSet<Node> = HashSet::new();
-
-    loop {
-        while next_nodes.len() > 0 && next_nodes[0].0 == t {
-            let (_, node) = next_nodes[0];
-            next_nodes.remove(0);
-
-            if node.0 == (rows - 1, cols - 1) && node.1 >= 4 {
-                return t;
-            }
-
-            if !visited.contains(&node) {
-                for new_node in get_next_nodes_wobbly(node, rows, cols) {
+                for new_node in gnn(node, rows, cols) {
                     next_nodes.push((t + heat_loss[new_node.0.0][new_node.0.1], new_node));
                     next_nodes.sort();
                 }
@@ -178,5 +146,9 @@ pub fn problem() -> (usize, String, String) {
         )
         .collect::<Vec<Vec<u64>>>();
 
-    return (DAY - 1, format!("{}", timed_bfs(&heat_loss)), format!("{}", timed_bfs_w(&heat_loss)));
+    return (
+        DAY - 1,
+        format!("{}", timed_bfs(&heat_loss, get_next_nodes)),
+        format!("{}", timed_bfs(&heat_loss, get_next_nodes_wobbly)),
+    );
 }
