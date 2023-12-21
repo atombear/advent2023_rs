@@ -20,6 +20,7 @@ mod problem20231216;
 mod problem20231217;
 mod problem20231218;
 mod problem20231219;
+mod problem20231220;
 
 fn process_answer(answers: &mut Vec<String>, idx: usize, ans0: String, ans1: String) {
     while answers.len() <= idx {
@@ -53,6 +54,7 @@ fn main() {
         problem20231217::problem,
         problem20231218::problem,
         problem20231219::problem,
+        problem20231220::problem,
         ] {
         let (idx, ans0, ans1) = daily_fn();
         process_answer(&mut answers, idx, ans0, ans1);
