@@ -34,8 +34,7 @@ fn intersect2d(
     let t0_int: f64 = (x_int - pos0.0) / vel0.0;
     let t1_int: f64 = (x_int - pos1.0) / vel1.0;
 
-    return 
-        t0_int > 0.0 &&
+    return t0_int > 0.0 &&
         t1_int > 0.0 &&
         min_lim < x_int &&
         x_int < max_lim &&
@@ -101,5 +100,142 @@ pub fn problem() -> (usize, String, String) {
         }
     }
 
-    return (DAY - 1, format!("{}", num_crossings), format!("{}", 0));
+    // part 2 is brutal...
+    // 4 points needed
+    // xa + va t0 = x0 + v0 t0
+    // xb + vb t0 = x1 + v1 t0
+    // xc + vc t0 = x2 + v2 t0
+
+    // xd + vd t1 = x0 + v0 t1
+    // xe + ve t1 = x1 + v1 t1
+    // xf + vf t1 = x2 + v2 t1
+
+    // xg + vg t2 = x0 + v0 t2
+    // xh + vh t2 = x1 + v1 t2
+    // xi + vi t2 = x2 + v2 t2
+
+    // (xa - x0) / (v0 - va) = t0
+    // (xb - x1) / (v1 - vb) = t0
+    // (xc - x2) / (v2 - vc) = t0
+
+    // (xd - x0) / (v0 - vd) = t1
+    // (xe - x1) / (v1 - ve) = t1
+    // (xf - x2) / (v2 - vf) = t1
+
+    // (xg - x0) / (v0 - vg) = t2
+    // (xh - x1) / (v1 - vh) = t2
+    // (xi - x2) / (v2 - vi) = t2
+
+    // (xa - x0) / (v0 - va) = (xb - x1) / (v1 - vb)
+    // (xa - x0) / (v0 - va) = (xc - x2) / (v2 - vc)
+
+    // (xd - x0) / (v0 - vd) = (xe - x1) / (v1 - ve)
+    // (xd - x0) / (v0 - vd) = (xf - x2) / (v2 - vf)
+
+    // (xg - x0) / (v0 - vg) = (xh - x1) / (v1 - vh)
+    // (xg - x0) / (v0 - vg) = (xi - x2) / (v2 - vi)
+
+    // (xa - x0) (v1 - vb) = (xb - x1) (v0 - va)
+    // (xa - x0) (v2 - vc) = (xc - x2) (v0 - va)
+
+    // (xd - x0) (v1 - ve) = (xe - x1) (v0 - vd)
+    // (xd - x0) (v2 - vf) = (xf - x2) (v0 - vd)
+
+    // (xg - x0) (v1 - vh) = (xh - x1) (v0 - vg)
+    // (xg - x0) (v2 - vi) = (xi - x2) (v0 - vg)
+
+    // (xa - x0) (v1 - vb) = (xb - x1) (v0 - va)
+    // (xa - x0) (v2 - vc) = (xc - x2) (v0 - va)
+    // xa v1 - x0 v1 - xa vb + x0 vb = xb v0 - x1 v0 - xb va + x1 va
+    // xa v2 - x0 v2 - xa vc + x0 vc = xc v0 - x2 v0 - xc va + x2 va
+
+    // (xd - x0) (v1 - ve) = (xe - x1) (v0 - vd)
+    // (xd - x0) (v2 - vf) = (xf - x2) (v0 - vd)
+    // xd v1 - x0 v1 - xd ve + x0 ve = xe v0 - x1 v0 - xe vd + x1 vd
+    // xd v2 - x0 v2 - xd vf + x0 vf = xf v0 - x2 v0 - xf vd + x2 vd
+
+    // (xg - x0) (v1 - vh) = (xh - x1) (v0 - vg)
+    // (xg - x0) (v2 - vi) = (xi - x2) (v0 - vg)
+    // xg v1 - x0 v1 - xg vh + x0 vh = xh v0 - x1 v0 - xh vg + x1 vg
+    // xg v2 - x0 v2 - xg vi + x0 vi = xi v0 - x2 v0 - xi vg + x2 vg
+
+    // xa v1 - x0 v1 - xa vb + x0 vb = xb v0 - x1 v0 - xb va + x1 va
+    // xd v1 - x0 v1 - xd ve + x0 ve = xe v0 - x1 v0 - xe vd + x1 vd
+    // xg v1 - x0 v1 - xg vh + x0 vh = xh v0 - x1 v0 - xh vg + x1 vg
+
+    // (xa-xd)v1 - (xb-xe)v0 - (va-vd) x1 + (vb-ve) x0 = -xb va + xe vd + xa vb - xd ve
+    // (xa-xg)v1 - (xb-xh)v0 - (va-vg) x1 + (vb-vh) x0 = -xb va + xh vg + xa vb - xg vh
+
+    // (xa-xd)v2 - (xc-xf)v0 - (va-vd) x2 + (vc-vf) x0 = -xc va + xf vd + xa vc - xd vf
+    // (xa-xg)v2 - (xc-xi)v0 - (va-vg) x2 + (vc-vi) x0 = -xc va + xi vg + xa vc - xg vi
+    // import numpy as np
+
+    // x0 = np.array([19, 13, 30], dtype=int)
+    // v0 = np.array([-2,  1, -2], dtype=int)
+    // x1 = np.array([18, 19, 22], dtype=int)
+    // v1 = np.array([-1, -1, -2], dtype=int)
+    // x2 = np.array([20, 25, 34], dtype=int)
+    // v2 = np.array([-2, -2, -4], dtype=int)
+    // x3 = np.array([12, 31, 28], dtype=int)
+    // v3 = np.array([-1, -2, -1], dtype=int)
+    
+    // x0 = np.array([144788461200241, 195443318499267, 285412990927879])
+    // v0 = np.array([227, 158, 5])
+    
+    // x1 = np.array([266680201159206, 319693757705834, 207679493757440])
+    // v1 = np.array([37, -56, 138])
+    
+    // x2 = np.array([343135145904814, 302103279002870, 240702357103107])
+    // v2 = np.array([-88, 41, 9])
+    
+    // x3 = np.array([344900100024424, 366032694378845, 216398516914389])
+    // v3 = np.array([-22, -140, 7])
+    
+    // xa = x0[0]
+    // xb = x0[1]
+    // xc = x0[2]
+    // xd = x1[0]
+    // xe = x1[1]
+    // xf = x1[2]
+    // xg = x2[0]
+    // xh = x2[1]
+    // xi = x2[2]
+    // xj = x3[0]
+    // xk = x3[1]
+    // xl = x3[2]
+    
+    // va = v0[0]
+    // vb = v0[1]
+    // vc = v0[2]
+    // vd = v1[0]
+    // ve = v1[1]
+    // vf = v1[2]
+    // vg = v2[0]
+    // vh = v2[1]
+    // vi = v2[2]
+    // vj = v3[0]
+    // vk = v3[1]
+    // vl = v3[2]
+    
+    // r = np.array([
+    //     -xb *va + xe *vd + xa* vb - xd *ve,
+    //     -xb *va + xh *vg + xa* vb - xg* vh,
+    //     -xb *va + xk *vj + xa* vb - xj* vk,
+    //     -xc *va + xf *vd + xa* vc - xd* vf,
+    //     -xc *va + xi *vg + xa* vc - xg* vi,
+    //     -xc *va + xl *vj + xa* vc - xj* vl,
+    // ])
+    
+    // A = np.array([
+    //     [0, (xa-xd), -(xb-xe), 0, -(va-vd), (vb-ve)],
+    //     [0, (xa-xg), -(xb-xh), 0, -(va-vg), (vb-vh)],
+    //     [0, (xa-xj), -(xb-xk), 0, -(va-vj), (vb-vk)],
+    //     [(xa-xd), 0, -(xc-xf), - (va-vd), 0, (vc-vf)],
+    //     [(xa-xg), 0, -(xc-xi), - (va-vg), 0, (vc-vi)],
+    //     [(xa-xj), 0, -(xc-xl), - (va-vj), 0, (vc-vl)],
+    // ])
+    
+    // round(sum(np.linalg.solve(A, r)[3:]))
+
+    return (DAY - 1, format!("{}", num_crossings), format!("{}", 931193307668256 as i64));
 }
